@@ -1,16 +1,3 @@
-console.log("parser.js loaded");
-
-// function readInt32(data, offset)
-// {
-//     return (
-//         data[offset] |
-//         (data[offset+1] << 8) |
-//         (data[offset+2] << 16) |
-//         (data[offset+3] << 24)
-//     );
-// }
-
-
 function readInt32(data, offset)
 {
     return (
@@ -44,7 +31,6 @@ function readProperty(data, offset)
 
     offset = name.next;
 
-
     if(name.text === "None")
     {
         return {
@@ -53,19 +39,15 @@ function readProperty(data, offset)
         };
     }
 
-
     let type = readString(data, offset);
 
     offset = type.next;
 
-
     let size = readInt32(data, offset);
     offset += 4;
 
-
     let arrayIndex = readInt32(data, offset);
     offset += 4;
-
 
     console.log(
         "PROPERTY",
@@ -75,9 +57,7 @@ function readProperty(data, offset)
         size
     );
 
-
     let value;
-
 
     switch(type.text)
     {
@@ -85,10 +65,7 @@ function readProperty(data, offset)
         case "IntProperty":
 
             value = readInt32(data, offset);
-
             break;
-
-
 
         case "DoubleProperty":
 
@@ -96,18 +73,12 @@ function readProperty(data, offset)
                 data.buffer
             )
             .getFloat64(offset,true);
-
             break;
-
-
 
         case "StrProperty":
 
             value = readString(data,offset).text;
-
             break;
-
-
 
         case "MapProperty":
 
@@ -118,8 +89,6 @@ function readProperty(data, offset)
 
             break;
 
-
-
         default:
 
             value =
@@ -127,7 +96,6 @@ function readProperty(data, offset)
 
             break;
     }
-
 
     return {
 
@@ -144,18 +112,10 @@ function readMap(data,offset)
 {
     let result={};
 
-
     // number of entries
     let count = readInt32(data,offset);
 
     offset +=4;
-
-
-    console.log(
-        "MAP ENTRIES:",
-        count
-    );
-
 
     for(let i=0;i<count;i++)
     {
@@ -164,7 +124,6 @@ function readMap(data,offset)
 
         offset = key.next;
 
-
         let value = readInt32(
             data,
             offset
@@ -172,10 +131,8 @@ function readMap(data,offset)
 
         offset +=4;
 
-
         result[key.text]=value;
     }
-
 
     return result;
 }
@@ -195,8 +152,6 @@ function parse(buffer) {
 
         let possibleLength = readInt32(data, offset);
 
-
-        // sanity check for string length
         if(possibleLength > 0 && possibleLength < 100) {
 
             let start = offset + 4;
@@ -206,11 +161,9 @@ function parse(buffer) {
                 start + possibleLength - 1
             );
 
-
             let text =
                 new TextDecoder()
                 .decode(strBytes);
-
 
             // printable ASCII check
             if(/^[A-Za-z0-9_]+$/.test(text)) {
@@ -263,90 +216,25 @@ function parse(buffer) {
     return result;
 }
 
-// function parseMapProperty(data, offset)
-// {
-//     let result={};
-
-
-//     // skip map size/hash information
-//     offset += 8;
-
-
-//     // key property
-//     let keyType = readString(data, offset);
-//     offset = keyType.next;
-
-
-//     // value property
-//     let valueType = readString(data, offset);
-//     offset = valueType.next;
-
-
-//     console.log(
-//         "Map:",
-//         keyType.text,
-//         valueType.text,
-//         "at",
-//         offset
-//     );
-
-
-//     while(offset < data.length-8)
-//     {
-//         let key = readString(data, offset);
-//         offset = key.next;
-
-
-//         if(!key.text)
-//             break;
-
-
-//         let value = readInt32(data, offset);
-//         offset += 4;
-
-
-//         result[key.text]=value;
-//     }
-  
-//     return result;
-// }
-
 function readMapProperty(data, offset)
 {
     let result={};
-
 
     // map count
     let count = readInt32(data, offset);
 
     offset += 4;
 
-
     // skip unknown map data
     offset += 4;
-
-
 
     let keyType = readString(data, offset);
 
     offset = keyType.next;
 
-
-
     let valueType = readString(data, offset);
 
     offset = valueType.next;
-
-
-
-    console.log(
-        "MAP",
-        keyType.text,
-        valueType.text,
-        count
-    );
-
-
 
     for(let i=0;i<count;i++)
     {
@@ -354,9 +242,7 @@ function readMapProperty(data, offset)
 
         offset = key.next;
 
-
         let value;
-
 
         if(valueType.text === "DoubleProperty")
         {
@@ -376,10 +262,8 @@ function readMapProperty(data, offset)
             offset += 4;
         }
 
-
         result[key.text]=value;
     }
-
 
     return result;
 }
@@ -391,18 +275,14 @@ function readProperty(data, offset)
     if(!name.text)
         return null;
 
-
     offset = name.next;
-
 
     let type = readString(data, offset);
 
     if(!type.text)
         return null;
 
-
     offset = type.next;
-
 
     let size = readInt32(data, offset);
 
@@ -421,7 +301,6 @@ function readProperty(data, offset)
 
             break;
 
-
         case "DoubleProperty":
 
             value =
@@ -435,8 +314,6 @@ function readProperty(data, offset)
 
             break;
 
-
-
         case "MapProperty":
 
             value =
@@ -446,8 +323,6 @@ function readProperty(data, offset)
                 );
 
             break;
-
-
 
         default:
 
@@ -459,8 +334,6 @@ function readProperty(data, offset)
             value =
             "[Unsupported " + type.text + "]";
     }
-
-
 
     return {
         name:name.text,
@@ -477,7 +350,6 @@ function parseIntMap(data, offset)
 
     // skip map header
     offset += 8;
-
 
     while(offset < data.length-4)
     {
@@ -498,7 +370,6 @@ function parseIntMap(data, offset)
         result[key.text]=value;
     }
 
-
     return {
         data:result,
         next:offset
@@ -518,7 +389,6 @@ function renderStats(stats)
 
         if(typeof value==="object")
             continue;
-
 
         html += `
         <div class="stat">
@@ -543,15 +413,9 @@ document
 
     reader.onload=function(){
 
-    console.log("File loaded");
-
     let bytes=new Uint8Array(reader.result);
 
-    console.log("File size:", bytes.length);
-
     let output=parse(bytes);
-
-    console.log("Parser output:", output);
 
     renderStats(output);
 
