@@ -1,0 +1,42 @@
+body
+{
+    background:#111;
+    color:white;
+    font-family:Arial, sans-serif;
+    margin:20px;
+}
+
+
+.stat
+{
+    display:flex;
+    justify-content:space-between;
+
+    padding:8px 12px;
+
+    border-bottom:1px solid #333;
+
+    background:#181818;
+
+    margin-bottom:2px;
+
+    border-radius:4px;
+}
+
+
+.stat span
+{
+    color:#aaa;
+}
+
+
+.stat b
+{
+    color:#4caf50;
+}
+
+
+#output
+{
+    max-width:600px;
+}
