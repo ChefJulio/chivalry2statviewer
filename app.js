@@ -343,15 +343,15 @@ function renderOther(rows, challenges) {
 
   let challengeBlock = "";
   if (challenges.length) {
-    const active = challenges.filter(c => c.value !== 0).length;
+    const done = challenges.filter(c => c.value >= 1).length;
     const items = challenges.map(c => `
       <div class="row">
         <span class="row-label mono">${c.key}</span>
-        <span class="row-value">${fmtInt(c.value)}</span>
+        <span class="row-value">${c.value >= 1 ? "Complete" : fmtInt(c.value)}</span>
       </div>`).join("");
     challengeBlock = `
       <details class="challenges">
-        <summary>Challenge counters (${active} of ${challenges.length} nonzero)</summary>
+        <summary>Challenges (${done} of ${challenges.length} completed)</summary>
         ${items}
       </details>`;
   }
