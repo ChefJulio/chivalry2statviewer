@@ -1,42 +1,311 @@
-body
-{
-    background:#111;
-    color:white;
-    font-family:Arial, sans-serif;
-    margin:20px;
+/* Dark theme, committed (matches the game). Token values from a
+   CVD-validated palette; accent = blue 400, meter track = blue 700. */
+:root {
+  --page: #0d0d0d;
+  --surface: #1a1a19;
+  --ink: #ffffff;
+  --ink-2: #c3c2b7;
+  --muted: #898781;
+  --hairline: #2c2c2a;
+  --border: rgba(255, 255, 255, 0.10);
+  --accent: #3987e5;
+  --accent-track: #0d366b;
 }
 
+* { box-sizing: border-box; }
 
-.stat
-{
-    display:flex;
-    justify-content:space-between;
-
-    padding:8px 12px;
-
-    border-bottom:1px solid #333;
-
-    background:#181818;
-
-    margin-bottom:2px;
-
-    border-radius:4px;
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  max-width: 1100px;
+  line-height: 1.5;
 }
 
+/* ---------- header & intro ---------- */
 
-.stat span
-{
-    color:#aaa;
+header { text-align: center; margin-bottom: 24px; }
+
+h1 { margin: 0; font-size: 28px; letter-spacing: 0.02em; }
+
+.tagline { color: var(--ink-2); margin: 6px 0 0; }
+
+#dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 36px 20px;
+  border: 2px dashed var(--hairline);
+  border-radius: 12px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-
-.stat b
-{
-    color:#4caf50;
+#dropzone:hover, #dropzone.dragging {
+  border-color: var(--accent);
+  background: #1d2129;
 }
 
+#dropzone input { display: none; }
 
-#output
-{
-    max-width:600px;
+.drop-title { font-weight: 600; }
+
+.drop-sub, .privacy { color: var(--muted); font-size: 14px; }
+
+.privacy { text-align: center; margin: 10px 0 0; }
+
+.howto {
+  max-width: 640px;
+  margin: 18px auto 0;
+  color: var(--ink-2);
+  font-size: 14px;
 }
+
+.howto h3 {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+
+.howto ol { margin: 0; padding-left: 22px; }
+
+.howto li { margin-bottom: 6px; }
+
+.howto code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-size: 13px;
+}
+
+.howto kbd {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+#copy-path {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--ink-2);
+  padding: 3px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#copy-path:hover { border-color: var(--accent); color: var(--ink); }
+
+/* Collapse the intro once a file is loaded */
+#intro.loaded #dropzone { padding: 12px 20px; flex-direction: row; gap: 10px; }
+#intro.loaded .drop-title { font-size: 14px; font-weight: 500; }
+#intro.loaded .drop-sub { font-size: 13px; }
+#intro.loaded .privacy, #intro.loaded .howto { display: none; }
+
+/* ---------- KPI tiles ---------- */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.tile-label { color: var(--ink-2); font-size: 13px; }
+
+.tile-value { font-size: 30px; font-weight: 600; margin: 2px 0; }
+
+.tile-sub { color: var(--muted); font-size: 12px; }
+
+/* ---------- cards & rows ---------- */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .card-grid { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+}
+
+.card h2 {
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin: 0 0 10px;
+}
+
+.card h2.gap { margin-top: 22px; }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 14px;
+}
+
+.row:last-child { border-bottom: none; }
+
+.row-label { color: var(--ink-2); }
+
+.row-value { font-variant-numeric: tabular-nums; }
+
+.total-row { font-weight: 600; }
+.total-row .row-label { color: var(--ink); }
+
+.muted { color: var(--muted); }
+
+/* ---------- factions ---------- */
+
+.faction { padding: 6px 0; }
+
+.faction-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.meter {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--accent-track);
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+/* ---------- tables ---------- */
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); }
+
+th {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+th:hover { color: var(--ink); }
+
+tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+tbody tr:last-child td { border-bottom: none; }
+
+.left { text-align: left; }
+
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+td b { font-weight: 600; }
+
+/* inline magnitude bar (weapon kills) */
+.bar-cell { display: flex; align-items: center; gap: 10px; }
+
+.bar-track { flex: 1; min-width: 60px; height: 6px; }
+
+.bar {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.bar-value { min-width: 58px; }
+
+.caption { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
+
+/* ---------- challenge counters ---------- */
+
+.challenges { margin-top: 10px; }
+
+.challenges summary {
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.challenges summary:hover { color: var(--ink); }
+
+.mono {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 12.5px;
+}
+
+/* ---------- controls ---------- */
+
+.controls {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+#weapon-search {
+  background: var(--page);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 7px 12px;
+  font-size: 14px;
+  width: 220px;
+}
+
+#weapon-search:focus { outline: none; border-color: var(--accent); }
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.toggle input { accent-color: var(--accent); }

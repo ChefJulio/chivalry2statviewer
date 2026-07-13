@@ -1,21 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Chivalry 2 Stats Viewer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>Chivalry 2 Stats Viewer</h1>
-<h>Type %LOCALAPPDATA%\Chivalry 2\Saved\Cloud into the file explorer address bar and load the FlavorStats file.</h>
-<br/><br/><br/>
-<input type="file" id="file">
+<header>
+    <h1>Chivalry 2 Stats Viewer</h1>
+    <p class="tagline">Load your FlavorStats save file to see every stat the game tracks.</p>
+</header>
 
-<div id="output"></div>
+<section id="intro">
+    <label id="dropzone" for="file">
+        <input type="file" id="file">
+        <span class="drop-title">Drop your FlavorStats file here</span>
+        <span class="drop-sub">or click to browse</span>
+    </label>
+    <div class="howto">
+        <h3>How to find your stats file</h3>
+        <ol>
+            <li>Copy this path:
+                <code>%LOCALAPPDATA%\Chivalry 2\Saved\Cloud</code>
+                <button id="copy-path" type="button">Copy</button>
+            </li>
+            <li>Press <kbd>Win</kbd>+<kbd>E</kbd> to open File Explorer, paste the path
+                into the address bar at the top, and press Enter.</li>
+            <li>Find the files whose names start with <code>FlavorStats_</code>.
+                If there is more than one, yours is the largest and most recently
+                modified one that does <em>not</em> end in <code>_local</code>.
+                (Smaller ones belong to other accounts that have played on your PC;
+                <code>_local</code> files are the game's own working copies.)</li>
+            <li>Drag that file onto the box above, or click the box and browse to it.</li>
+        </ol>
+    </div>
+    <p class="privacy">Your file is parsed locally in your browser and never uploaded.</p>
+</section>
+
+<main id="results"></main>
 
 <script src="parser.js"></script>
+<script src="app.js"></script>
 
 </body>
 

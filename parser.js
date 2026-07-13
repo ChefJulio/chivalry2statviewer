@@ -1,3 +1,11 @@
+/*
+ * parser.js - extracts stats from a Chivalry 2 FlavorStats save file.
+ *
+ * The file stores stats as length-prefixed, null-terminated strings each
+ * followed by a little-endian int32 value. parse() scans the whole buffer
+ * for that pattern and returns a flat { statName: value } object.
+ */
+
 function readInt32(data, offset)
 {
     return (
@@ -20,133 +28,18 @@ function readString(data, offset)
         .decode(bytes);
 
     return {
-        text:text,
-        next:offset + length
+        text: text,
+        next: offset + length
     };
 }
 
-function readProperty(data, offset)
+function parse(buffer)
 {
-    let name = readString(data, offset);
-
-    offset = name.next;
-
-    if(name.text === "None")
-    {
-        return {
-            name:"None",
-            next:offset
-        };
-    }
-
-    let type = readString(data, offset);
-
-    offset = type.next;
-
-    let size = readInt32(data, offset);
-    offset += 4;
-
-    let arrayIndex = readInt32(data, offset);
-    offset += 4;
-
-    console.log(
-        "PROPERTY",
-        name.text,
-        type.text,
-        "size",
-        size
-    );
-
-    let value;
-
-    switch(type.text)
-    {
-
-        case "IntProperty":
-
-            value = readInt32(data, offset);
-            break;
-
-        case "DoubleProperty":
-
-            value = new DataView(
-                data.buffer
-            )
-            .getFloat64(offset,true);
-            break;
-
-        case "StrProperty":
-
-            value = readString(data,offset).text;
-            break;
-
-        case "MapProperty":
-
-            value = readMap(
-                data,
-                offset
-            );
-
-            break;
-
-        default:
-
-            value =
-            "[Unsupported "+type.text+"]";
-
-            break;
-    }
-
-    return {
-
-        name:name.text,
-
-        value:value,
-
-        next:offset + size
-
-    };
-}
-
-function readMap(data,offset)
-{
-    let result={};
-
-    // number of entries
-    let count = readInt32(data,offset);
-
-    offset +=4;
-
-    for(let i=0;i<count;i++)
-    {
-
-        let key = readString(data,offset);
-
-        offset = key.next;
-
-        let value = readInt32(
-            data,
-            offset
-        );
-
-        offset +=4;
-
-        result[key.text]=value;
-    }
-
-    return result;
-}
-
-function parse(buffer) {
-
-    console.log("parse() started");
-
     const data = new Uint8Array(buffer);
 
     let result = {};
 
     let offset = 0;
-
 
     while(offset < data.length - 8) {
 
@@ -168,26 +61,13 @@ function parse(buffer) {
             // printable ASCII check
             if(/^[A-Za-z0-9_]+$/.test(text)) {
 
-
                 let valueOffset =
                     start + possibleLength;
 
-
                 let value =
-                    readInt32(data,valueOffset);
+                    readInt32(data, valueOffset);
 
-
-                console.log(
-                    text,
-                    "=",
-                    value,
-                    "at",
-                    offset
-                );
-
-
-                result[text]=value;
-
+                result[text] = value;
 
                 offset = valueOffset + 4;
 
@@ -195,10 +75,10 @@ function parse(buffer) {
             }
         }
 
-
         offset++;
     }
 
+    // serialization metadata picked up by the scan, not real stats
     const ignore = [
         "UserChangelist",
         "FlavorStats",
@@ -216,210 +96,7 @@ function parse(buffer) {
     return result;
 }
 
-function readMapProperty(data, offset)
-{
-    let result={};
-
-    // map count
-    let count = readInt32(data, offset);
-
-    offset += 4;
-
-    // skip unknown map data
-    offset += 4;
-
-    let keyType = readString(data, offset);
-
-    offset = keyType.next;
-
-    let valueType = readString(data, offset);
-
-    offset = valueType.next;
-
-    for(let i=0;i<count;i++)
-    {
-        let key = readString(data, offset);
-
-        offset = key.next;
-
-        let value;
-
-        if(valueType.text === "DoubleProperty")
-        {
-            value =
-                new DataView(data.buffer)
-                .getFloat64(
-                    offset,
-                    true
-                );
-
-            offset += 8;
-        }
-        else
-        {
-            value = readInt32(data,offset);
-
-            offset += 4;
-        }
-
-        result[key.text]=value;
-    }
-
-    return result;
+// Allow the parser to be tested in Node
+if (typeof module !== "undefined") {
+    module.exports = { parse, readInt32, readString };
 }
-
-function readProperty(data, offset)
-{
-    let name = readString(data, offset);
-
-    if(!name.text)
-        return null;
-
-    offset = name.next;
-
-    let type = readString(data, offset);
-
-    if(!type.text)
-        return null;
-
-    offset = type.next;
-
-    let size = readInt32(data, offset);
-
-    offset += 4;
-
-
-    let value;
-
-
-    switch(type.text)
-    {
-
-        case "IntProperty":
-
-            value = readInt32(data, offset);
-
-            break;
-
-        case "DoubleProperty":
-
-            value =
-                new DataView(
-                    data.buffer
-                )
-                .getFloat64(
-                    offset,
-                    true
-                );
-
-            break;
-
-        case "MapProperty":
-
-            value =
-                readMapProperty(
-                    data,
-                    offset
-                );
-
-            break;
-
-        default:
-
-            console.log(
-                "Unsupported property:",
-                type.text
-            );
-
-            value =
-            "[Unsupported " + type.text + "]";
-    }
-
-    return {
-        name:name.text,
-        type:type.text,
-        value:value,
-        next:offset + size
-    };
-}
-
-
-function parseIntMap(data, offset)
-{
-    let result={};
-
-    // skip map header
-    offset += 8;
-
-    while(offset < data.length-4)
-    {
-        let key = readString(data, offset);
-
-        offset = key.next;
-
-
-        if(!key.text)
-            break;
-
-
-        let value = readInt32(data, offset);
-
-        offset += 4;
-
-
-        result[key.text]=value;
-    }
-
-    return {
-        data:result,
-        next:offset
-    };
-}
-
-function renderStats(stats)
-{
-    let html="";
-
-
-    for(let key in stats)
-    {
-
-        let value=stats[key];
-
-
-        if(typeof value==="object")
-            continue;
-
-        html += `
-        <div class="stat">
-            <span>${key}</span>
-            <b>${value}</b>
-        </div>
-        `;
-    }
-
-
-    document.getElementById("output")
-    .innerHTML=html;
-}
-
-document
-.getElementById("file")
-.addEventListener("change", e=>{
-
-    let file=e.target.files[0];
-
-    let reader=new FileReader();
-
-    reader.onload=function(){
-
-    let bytes=new Uint8Array(reader.result);
-
-    let output=parse(bytes);
-
-    renderStats(output);
-
-};
-    reader.readAsArrayBuffer(file);
-
-});
