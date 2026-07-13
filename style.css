@@ -277,6 +277,10 @@ td b { font-weight: 600; }
   font-size: 12.5px;
 }
 
+.ach b { display: block; color: var(--ink); font-weight: 600; }
+
+.ach-desc { display: block; color: var(--muted); font-size: 12px; }
+
 /* ---------- controls ---------- */
 
 .controls {

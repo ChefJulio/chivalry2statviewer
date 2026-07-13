@@ -29,6 +29,52 @@ const COMBAT_STATS = [
 
 const FACTIONS = ["Agatha", "Mason", "Tenosia"];
 
+// Steam achievement titles/descriptions. The game's internal API names are
+// exactly the keys of the save file's AchievementProgressEx map.
+const ACHIEVEMENTS = {
+  KILL_10: ["Kill 10 Enemies", "Kill 10 Enemies in a Multiplayer match."],
+  KILL_50: ["Kill 50 Enemies", "Kill 50 Enemies in a Multiplayer match."],
+  KILL_100: ["Kill 100 Enemies", "Kill 100 Enemies in a Multiplayer match."],
+  KILL_250: ["Kill 250 Enemies", "Kill 250 Enemies in a Multiplayer match."],
+  KILL_500: ["Kill 500 Enemies", "Kill 500 Enemies in a Multiplayer match."],
+  KILL_1000: ["Kill 1000 Enemies", "Kill 1000 Enemies in a Multiplayer match."],
+  KILL_1500: ["Kill 1500 Enemies", "Kill 1500 Enemies in a Multiplayer match."],
+  KILL_2000: ["Kill 2000 Enemies", "Kill 2000 Enemies in a Multiplayer match."],
+  KILL_100_KNIGHT: ["Deus Vult", "Achieve 100 kills as Knight"],
+  KILL_100_FOOTMAN: ["Feet on the Ground", "Achieve 100 kills as Footman"],
+  KILL_100_VANGUARD: ["Avant-Garde", "Achieve 100 kills as Vanguard"],
+  KILL_100_ARCHER: ["Playing the wrong game", "Achieve 100 kills as Archer"],
+  KILL_BASTARD_BASTARD: ["Battle Of The Bastards", "Kill an enemy wielding a bastard sword, with a bastard sword"],
+  KILL_50_SIEGE: ["Bring Out The Big Guns", "Get 50 kills with siege weapons"],
+  KILL_13_BREAD: ["Baker's Dozen", "Kill 13 enemies with bread"],
+  KILL_10_UNARMED: ["Night Knight", "Get 10 unarmed kills"],
+  KILL_2_UNDER_25: ["Seeing Red", "Achieve 2 kills in a row without dying while under 25 health"],
+  KILL_FROM_100M: ["Long Range Menace", "Kill an enemy with a projectile from over 100 meters"],
+  "50_KILLS_1_MATCH": ["Brave Brave Sir Robin", "Get 50 kills in one match"],
+  CAUSE_FALL_DEATH: ["The Things I Do For Love", "Make an enemy fall to their death"],
+  DIE_FIRE: ["This Is Fine", "Die from fire"],
+  BE_REVIVED: ["I got better!", "Get revived from a downed state"],
+  REVIVE_10: ["Field Medic", "Revive 10 downed teammates"],
+  BANDAGE_3X_1_LIFE: ["What Do We Say To the God of Death?", "Bandage yourself 3 times in one life"],
+  COUNTER_200: ["The Count", "Successfully counter 200 attacks"],
+  DEFLECT_100: ["Yadome", "Deflect 100 projectiles"],
+  FIRE_1000: ["Fight In The Shade", "Fire 1000 arrows"],
+  MATCHWIN_AGATHA_10: ["Win as Agatha 10 times", "Win as Agatha 10 times"],
+  MATCHWIN_MASON_10: ["Win as Mason 10 times", "Win as Mason 10 times"],
+  MATCHWIN_CASTLESIEGE_5: ["Win Rudhelm Siege 5 times", "Win Rudhelm Siege 5 times"],
+  MATCHWIN_CASTLESIEGE_10: ["Win Rudhelm Siege 10 times", "Win Rudhelm Siege 10 times"],
+  MATCHWIN_CASTLESIEGE_25: ["Win Rudhelm Siege 25 times", "Win Rudhelm Siege 25 times"],
+  MATCHWIN_DARKFOREST_5: ["Win Dark Forest 5 times", "Win Dark Forest 5 times"],
+  MATCHWIN_DARKFOREST_10: ["Win Dark Forest 10 times", "Win Dark Forest 10 times"],
+  MATCHWIN_DARKFOREST_25: ["Win Dark Forest 25 times", "Win Dark Forest 25 times"],
+  MATCHWIN_LIONSPIRE_5: ["Win Lionspire 5 times", "Win Lionspire 5 times"],
+  MATCHWIN_LIONSPIRE_10: ["Win Lionspire 10 times", "Win Lionspire 10 times"],
+  MATCHWIN_LIONSPIRE_25: ["Win Lionspire 25 times", "Win Lionspire 25 times"],
+  MATCHWIN_COXWELL_5: ["Win Coxwell 5 times", "Win Coxwell 5 times"],
+  MATCHWIN_COXWELL_10: ["Win Coxwell 10 times", "Win Coxwell 10 times"],
+  MATCHWIN_COXWELL_25: ["Win Coxwell 25 times", "Win Coxwell 25 times"]
+};
+
 const MODES = [
   ["MatchesCompletedTeamObjective", "Team Objective"],
   ["MatchesCompletedTeamDeathmatch", "Team Deathmatch"],
@@ -344,14 +390,20 @@ function renderOther(rows, challenges) {
   let challengeBlock = "";
   if (challenges.length) {
     const done = challenges.filter(c => c.value >= 1).length;
-    const items = challenges.map(c => `
-      <div class="row">
-        <span class="row-label mono">${c.key}</span>
+    const items = challenges.map(c => {
+      const ach = ACHIEVEMENTS[c.key];
+      const label = ach
+        ? `<span class="row-label ach"><b>${ach[0]}</b><span class="ach-desc">${ach[1]}</span></span>`
+        : `<span class="row-label mono">${c.key}</span>`;
+      return `
+      <div class="row" title="${c.key}">
+        ${label}
         <span class="row-value">${c.value >= 1 ? "Complete" : (c.value * 100).toFixed(0) + "%"}</span>
-      </div>`).join("");
+      </div>`;
+    }).join("");
     challengeBlock = `
       <details class="challenges">
-        <summary>Challenges (${done} of ${challenges.length} completed)</summary>
+        <summary>Achievements (${done} of ${challenges.length} completed)</summary>
         ${items}
       </details>`;
   }
