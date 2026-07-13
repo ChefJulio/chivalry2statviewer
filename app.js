@@ -347,7 +347,7 @@ function renderOther(rows, challenges) {
     const items = challenges.map(c => `
       <div class="row">
         <span class="row-label mono">${c.key}</span>
-        <span class="row-value">${c.value >= 1 ? "Complete" : fmtInt(c.value)}</span>
+        <span class="row-value">${c.value >= 1 ? "Complete" : (c.value * 100).toFixed(0) + "%"}</span>
       </div>`).join("");
     challengeBlock = `
       <details class="challenges">
