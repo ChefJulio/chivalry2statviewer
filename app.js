@@ -227,13 +227,17 @@ function renderModes(modes, total, ffa) {
     </div>`).join("");
   const podium = `
     <div class="row podium">
-      <span class="row-label">FFA podium finishes</span>
+      <span class="row-label">Scoreboard placements</span>
       <span class="row-value">
-        <span title="1st place">1st: ${fmtInt(ffa.first)}</span> &middot;
-        <span title="2nd place">2nd: ${fmtInt(ffa.second)}</span> &middot;
-        <span title="3rd place">3rd: ${fmtInt(ffa.third)}</span>
+        <span title="Matches finished 1st on the scoreboard">1st: ${fmtInt(ffa.first)}</span> &middot;
+        <span title="Matches finished 2nd on the scoreboard">2nd: ${fmtInt(ffa.second)}</span> &middot;
+        <span title="Matches finished 3rd on the scoreboard">3rd: ${fmtInt(ffa.third)}</span>
       </span>
-    </div>`;
+    </div>
+    <p class="caption">Placements are stored under "FFA" names internally but count
+      top scoreboard finishes in every mode (verified by diffing save snapshots
+      between sessions). The 3rd-place counter rarely writes - another quirk of
+      the game's own tracking.</p>`;
   return `
     <div class="row total-row">
       <span class="row-label">All modes</span>
